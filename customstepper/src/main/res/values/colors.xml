@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="stpi_default_circle_color">#ffffff</color>
+    <color name="stpi_default_primary_color">#ffffff</color>
+    <color name="stpi_default_line_color">#ffffff</color>
+    <color name="stpi_default_text_color">#000</color>
+</resources>
