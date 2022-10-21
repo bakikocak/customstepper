@@ -3,9 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="../../../layout/custom_preview.xml" value="0.1322463768115942" />
+        <entry key="../../../layout/custom_preview.xml" value="0.2" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.21927083333333333" />
         <entry key="app/src/main/res/layout/fragment_page.xml" value="0.1" />
+        <entry key="customstepper/src/main/res/drawable-anydpi/ic_done_black_18dp.xml" value="0.1945" />
+        <entry key="customstepper/src/main/res/drawable/ic_gift.xml" value="0.116" />
+        <entry key="customstepper/src/main/res/drawable/ic_last.xml" value="0.1945" />
+        <entry key="customstepper/src/main/res/drawable/ic_prize.xml" value="0.1765" />
       </map>
     </option>
   </component>

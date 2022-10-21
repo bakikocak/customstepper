@@ -2,12 +2,16 @@ package com.bakikocak.customstepper;
 
 
 import com.bakikocak.customstepper.R;
+
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
@@ -16,6 +20,7 @@ import android.graphics.Path;
 import android.graphics.PathEffect;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Parcel;
@@ -350,6 +355,8 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
 
     private ViewPager pager;
     private Drawable doneIcon;
+    private Bitmap lastItemIcon;
+    private Drawable lastItemDrawable;
     private boolean showDoneIcon;
 
     // If viewpager is attached, viewpager's page titles are used when {@code showLabels} equals true
@@ -396,6 +403,7 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
             return super.onSingleTapConfirmed(e);
         }
     };
+
 
     public StepperIndicator(Context context) {
         this(context, null);
@@ -450,6 +458,7 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
         return new DashPathEffect(new float[]{pathLength, pathLength}, Math.max(phase * pathLength, offset));
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private void init(Context context, AttributeSet attrs, int defStyleAttr) {
         final Resources resources = getResources();
 
@@ -617,6 +626,7 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
         animDuration = typedArray.getInteger(R.styleable.StepperIndicator_stpi_animDuration, DEFAULT_ANIMATION_DURATION);
         showDoneIcon = typedArray.getBoolean(R.styleable.StepperIndicator_stpi_showDoneIcon, true);
         doneIcon = typedArray.getDrawable(R.styleable.StepperIndicator_stpi_doneIconDrawable);
+        //lastItemIcon = typedArray.getDrawable(R.styleable.StepperIndicator_stpi_lastIconDrawable);
 
         // Labels Configuration
         labelPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
@@ -655,6 +665,12 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
             int size = getContext().getResources().getDimensionPixelSize(R.dimen.stpi_done_icon_size);
             doneIcon.setBounds(0, 0, size, size);
         }
+
+        lastItemDrawable = getResources().getDrawable(R.drawable.ic_gift);
+        lastItemIcon = drawableToBitmap(lastItemDrawable);
+
+
+        //lastItemIcon = ContextCompat.getDrawable(context, R.drawable.ic_gift);
 
         // Display at least 1 cleared step for preview in XML editor
         if (isInEditMode()) {
@@ -711,7 +727,7 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
     private void compute() {
         if (null == circlePaint) {
             throw new IllegalArgumentException("circlePaint is invalid! Make sure you setup the field circlePaint " +
-                                                       "before calling compute() method!");
+                    "before calling compute() method!");
         }
 
         indicators = new float[stepCount];
@@ -759,13 +775,13 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
     public void computeStepsClickAreas() {
         if (stepCount == STEP_INVALID) {
             throw new IllegalArgumentException("stepCount wasn't setup yet. Make sure you call setStepCount() " +
-                                                       "before computing the steps click area!");
+                    "before computing the steps click area!");
         }
 
         if (null == indicators) {
             throw new IllegalArgumentException("indicators wasn't setup yet. Make sure the indicators are " +
-                                                       "initialized and setup correctly before trying to compute the click " +
-                                                       "area for each step!");
+                    "initialized and setup correctly before trying to compute the click " +
+                    "area for each step!");
         }
 
         // Initialize the list for the steps click area
@@ -827,7 +843,7 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
             if (labels[i] == null) continue;
 
             labelLayouts[i] = new StaticLayout(labels[i], labelPaint, gridWidth,
-                                               Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
+                    Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
             maxLabelHeight = Math.max(maxLabelHeight, labelLayouts[i].getLineCount() * labelSingleLineHeight);
         }
     }
@@ -856,6 +872,8 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
             // We draw the "done" check if previous step, or if we are going back (if going back, animated value will reduce radius to 0)
             boolean drawCheck = i < currentStep || (drawFromNext && i == currentStep);
 
+            boolean isLatItem = i == indicators.length - 1;
+
             // Draw back circle
             canvas.drawCircle(indicator, centerY, circleRadius, getStepCirclePaint(i));
 
@@ -864,7 +882,7 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
                 final String stepLabel = String.valueOf(i + 1);
 
                 stepAreaRect.set((int) (indicator - circleRadius), (int) (centerY - circleRadius),
-                                 (int) (indicator + circleRadius), (int) (centerY + circleRadius));
+                        (int) (indicator + circleRadius), (int) (centerY + circleRadius));
                 stepAreaRectF.set(stepAreaRect);
 
                 Paint stepTextNumberPaint = getStepTextNumberPaint(i);
@@ -878,14 +896,14 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
                 stepAreaRectF.top += (stepAreaRect.height() - stepAreaRectF.bottom) / 2.0f;
 
                 canvas.drawText(stepLabel, stepAreaRectF.left, stepAreaRectF.top - stepTextNumberPaint.ascent(),
-                                stepTextNumberPaint);
+                        stepTextNumberPaint);
             }
 
             if (showLabels && labelLayouts != null &&
                     i < labelLayouts.length && labelLayouts[i] != null) {
                 drawLayout(labelLayouts[i],
-                           indicator, getHeight() - getBottomIndicatorHeight() - maxLabelHeight,
-                           canvas, labelPaint);
+                        indicator, getHeight() - getBottomIndicatorHeight() - maxLabelHeight,
+                        canvas, labelPaint);
             }
 
             if (useBottomIndicator) {
@@ -893,23 +911,29 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
                 if (i == currentStep) {
                     // Draw custom indicator for current step only
                     canvas.drawRect(indicator - bottomIndicatorWidth / 2, getHeight() - bottomIndicatorHeight,
-                                    indicator + bottomIndicatorWidth / 2, getHeight(),
-                                    useBottomIndicatorWithStepColors ? getStepIndicatorPaint(i) : indicatorPaint);
+                            indicator + bottomIndicatorWidth / 2, getHeight(),
+                            useBottomIndicatorWithStepColors ? getStepIndicatorPaint(i) : indicatorPaint);
                 }
             } else {
                 // Show the current step indicator as bullet
                 // If current step, or coming back from next step and still animating
                 if ((i == currentStep && !drawFromNext) || (i == previousStep && drawFromNext && inAnimation)) {
                     // Draw animated indicator
-                    canvas.drawCircle(indicator, centerY, animIndicatorRadius, getStepIndicatorPaint(i));
+                    //canvas.drawCircle(indicator, centerY, animIndicatorRadius, getStepIndicatorPaint(i));
                 }
+            }
+
+            if (isLatItem) {
+
+                canvas.drawBitmap(lastItemIcon,  indicator - (lastItemDrawable.getIntrinsicWidth() / 2), centerY - (lastItemDrawable.getIntrinsicHeight() / 2), getStepIndicatorPaint(i));
             }
 
             // Draw check mark
             if (drawCheck) {
                 float radius = checkRadius;
                 // Use animated radius value?
-                if ((i == previousStep && drawToNext) || (i == currentStep && drawFromNext)) radius = animCheckRadius;
+                if ((i == previousStep && drawToNext) || (i == currentStep && drawFromNext))
+                    radius = animCheckRadius;
                 canvas.drawCircle(indicator, centerY, radius, getStepIndicatorPaint(i));
 
                 // Draw check bitmap
@@ -918,7 +942,7 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
                             (!inCheckAnimation && !(i == currentStep && !inAnimation))) {
                         canvas.save();
                         canvas.translate(indicator - (doneIcon.getIntrinsicWidth() / 2),
-                                         centerY - (doneIcon.getIntrinsicHeight() / 2));
+                                centerY - (doneIcon.getIntrinsicHeight() / 2));
                         doneIcon.draw(canvas);
                         canvas.restore();
                     }
@@ -1040,7 +1064,7 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
     private boolean isStepValid(final int stepPos) {
         if (stepPos < 0 || stepPos > stepCount - 1) {
             throw new IllegalArgumentException("Invalid step position. " + stepPos + " is not a valid position! it " +
-                                                       "should be between 0 and stepCount(" + stepCount + ")");
+                    "should be between 0 and stepCount(" + stepCount + ")");
         }
 
         return true;
@@ -1125,12 +1149,12 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
 
             // Same time, pop check mark
             checkAnimator = ObjectAnimator.ofFloat(StepperIndicator.this, "animCheckRadius", indicatorRadius,
-                                                   checkRadius * EXPAND_MARK, checkRadius);
+                    checkRadius * EXPAND_MARK, checkRadius);
 
             // Finally, pop current step indicator
             animIndicatorRadius = 0;
             indicatorAnimator = ObjectAnimator.ofFloat(StepperIndicator.this, "animIndicatorRadius", 0f,
-                                                       indicatorRadius * 1.4f, indicatorRadius);
+                    indicatorRadius * 1.4f, indicatorRadius);
 
             animatorSet.play(lineAnimator).with(checkAnimator).before(indicatorAnimator);
         } else if (currentStep == previousStep - 1) {
@@ -1484,5 +1508,19 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
             super.writeToParcel(dest, flags);
             dest.writeInt(mCurrentStep);
         }
+    }
+
+    public static Bitmap drawableToBitmap (Drawable drawable) {
+
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable)drawable).getBitmap();
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 }

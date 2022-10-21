@@ -19,9 +19,18 @@
         android:id="@+id/stepper_indicator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        app:stpi_circleStrokeWidth="1dp"
+        app:stpi_doneIconDrawable="@drawable/ic_done_black_18dp"
+        app:stpi_indicatorColor="#ffffff"
+        app:stpi_indicatorRadius="0dp"
+        app:stpi_lineDoneColor="#ffffff"
+        app:stpi_lineMargin="0dp"
+        app:stpi_lineStrokeWidth="0.5dp"
+        app:stpi_showDoneIcon="true"
         app:stpi_labels="@array/stepLabels"/>
 
 </RelativeLayout>

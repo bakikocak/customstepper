@@ -19,6 +19,7 @@
         <attr name="stpi_showDoneIcon" format="boolean"/>
         <attr name="stpi_showStepNumberInstead" format="boolean"/>
         <attr name="stpi_doneIconDrawable" format="reference"/>
+        <attr name="stpi_lastIconDrawable" format="reference"/>
 
         <attr name="stpi_useBottomIndicator" format="boolean"/>
         <attr name="stpi_useBottomIndicatorWithStepColors" format="boolean"/>
