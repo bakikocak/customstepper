@@ -626,7 +626,6 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
         animDuration = typedArray.getInteger(R.styleable.StepperIndicator_stpi_animDuration, DEFAULT_ANIMATION_DURATION);
         showDoneIcon = typedArray.getBoolean(R.styleable.StepperIndicator_stpi_showDoneIcon, true);
         doneIcon = typedArray.getDrawable(R.styleable.StepperIndicator_stpi_doneIconDrawable);
-        //lastItemIcon = typedArray.getDrawable(R.styleable.StepperIndicator_stpi_lastIconDrawable);
 
         // Labels Configuration
         labelPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
